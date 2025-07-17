@@ -1,51 +1,8 @@
-// Load options
-var options = {
-  dontScrollPosts: false,
-  dontPlayGifs: false,
-  disableMarkdown: false,
-};
-
-if (window.vkManagerOptions) {
-  options = window.vkManagerOptions;
-}
-
-var renderer = new marked.Renderer();
-
-/*
- * Override marked default heading code
- * This will purge the "id" attr from the heading avoiding problems with
- * existing vk code that uses document.getElementById
- */
-renderer.heading = function (text, level) {
-  return '<h' + level + '>' + text + '</h' + level + '>';
-};
-
-/*
- * Disable images, since vk will convert the image link to an anchor the script
- * will not work
- */
-renderer.image = function(href, title, text) {
-  return text;
-};
-
-/*
- * Disable links - Vk has built in support
- */
-renderer.link = function(href, title, text) {
-  return text;
-};
-
-marked.setOptions({
-  renderer: renderer,
-  gfm: true,
-  breaks: true,
-});
-
 // Override nav.setLoc, this is called on every page change
-nav.setLoc = (function() {
+nav.setLoc = (function () {
   var cached_function = nav.setLoc;
 
-  return function() {
+  return function () {
 
     var result = cached_function.apply(this, arguments);
 
@@ -55,35 +12,17 @@ nav.setLoc = (function() {
   };
 })();
 
-var removeMarkdownBodyClass = function(postId) {
-  var $post = document.querySelector('[id^="post"][id$="' + (postId) + '"]');
-  if (!$post) {
-    return;
-  }
-
-  var $text = $post.querySelector('.bp_text');
-  if (!$text) {
-    return;
-  }
-
-  $text.classList.remove('markdown-body');
-};
-
-// Override Board.checkedUpdates, this is called after every board update
-//
-// NOTE:
-// Board might be undefined on some pages, try to override on every page changes
-var overrideBoardUpdates = function() {
+var overrideBoardUpdates = function () {
   if (typeof Board !== 'undefined'
-   && typeof Board.checkedUpdates !== 'undefined'
-   && !window.boardOverrided
+    && typeof Board.checkedUpdates !== 'undefined'
+    && !window.boardOverrided
   ) {
     window.boardOverrided = true;
 
-    Board.checkedUpdates = (function() {
+    Board.checkedUpdates = (function () {
       var cached_function = Board.checkedUpdates;
 
-      return function() {
+      return function () {
 
         var result = cached_function.apply(this, arguments);
 
@@ -97,15 +36,15 @@ var overrideBoardUpdates = function() {
   }
 
   if (typeof Pagination !== 'undefined'
-   && typeof Pagination.loaded !== 'undefined'
-   && !window.paginationOverrided
+    && typeof Pagination.loaded !== 'undefined'
+    && !window.paginationOverrided
   ) {
     window.paginationOverrided = true;
 
-    Pagination.loaded = (function() {
+    Pagination.loaded = (function () {
       var cached_function = Pagination.loaded;
 
-      return function() {
+      return function () {
 
         var result = cached_function.apply(this, arguments);
 
@@ -117,15 +56,15 @@ var overrideBoardUpdates = function() {
   }
 
   if (typeof Board !== 'undefined'
-   && typeof Board.editPost !== 'undefined'
-   && !window.editPostOverrided
+    && typeof Board.editPost !== 'undefined'
+    && !window.editPostOverrided
   ) {
     window.editPostOverrided = true;
 
-    Board.editPost = (function() {
+    Board.editPost = (function () {
       var cached_function = Board.editPost;
 
-      return function() {
+      return function () {
 
         var result = cached_function.apply(this, arguments);
 
@@ -139,15 +78,15 @@ var overrideBoardUpdates = function() {
   }
 
   if (typeof Board !== 'undefined'
-   && typeof Board.cancelEditPost !== 'undefined'
-   && !window.cancelEditPostOverrided
+    && typeof Board.cancelEditPost !== 'undefined'
+    && !window.cancelEditPostOverrided
   ) {
     window.cancelEditPostOverrided = true;
 
-    Board.cancelEditPost = (function() {
+    Board.cancelEditPost = (function () {
       var cached_function = Board.cancelEditPost;
 
-      return function() {
+      return function () {
 
         var result = cached_function.apply(this, arguments);
 
@@ -160,57 +99,8 @@ var overrideBoardUpdates = function() {
 };
 overrideBoardUpdates();
 
-// Play all gifs available on screen
-var playGifs = function() {
-  if (options.dontPlayGifs) {
-    return 1;
-  }
 
-  var $gifs = document.querySelectorAll('.media_desc.media_desc_soft:not([data-playing])');
-  [].forEach.call($gifs, function($gif) {
-    var $link = $gif.querySelector('a.photo.page_doc_photo_href');
-    if ($link) {
-      var $size = $link.querySelector('.doc_size');
-      var $ext = $link.querySelector('.doc_ext');
-
-      if (!$ext || $ext.textContent.toUpperCase() !== 'GIF') {
-        return;
-      }
-
-      if ($size && $size.textContent.match(/MB/)) {
-        var size = parseInt($size.textContent, 10);
-
-        if (typeof size === 'number' && size <= 4) {
-          $link.click();
-        } else {
-          // TODO: report error
-        }
-      } else {
-        $link.click();
-      }
-    }
-  });
-};
-
-var convertToMarkdown = function() {
-  if (options.disableMarkdown) {
-    return 1;
-  }
-
-  var $allTexts = document.querySelectorAll('.bp_text:not(.markdown-body)');
-  if ($allTexts) {
-    [].forEach.call($allTexts, function($text) {
-      var normalizedHtml = $text.innerHTML
-        .replace(/(<br\ ?\/?>)/mg, '\n') // Replace <br /> with \n
-        .replace(/^&gt;(.*)$/mg, '> $1'); // Replace &gt with >, blockquote support
-
-      $text.innerHTML = marked(normalizedHtml);
-      $text.classList.add('markdown-body');
-    });
-  }
-};
-
-var discussionBoardRoute = function() {
+var discussionBoardRoute = function () {
   // Update the "Discussion Board" to reload on click
   var $discussionBoard = document.querySelector('.ui_crumb:last-child');
 
@@ -235,11 +125,7 @@ var discussionBoardRoute = function() {
   }
 };
 
-var boardTopicRoute = function() {
-
-  playGifs();
-  convertToMarkdown();
-
+var boardTopicRoute = function () {
   // Update the "Discussion Board" crumb to reload the page on returning
   var $allCrumbs = document.querySelectorAll('.ui_crumb');
 
@@ -252,7 +138,7 @@ var boardTopicRoute = function() {
   }
 };
 
-var handleRouteChange = function() {
+var handleRouteChange = function () {
 
   // See NOTE above
   overrideBoardUpdates();
@@ -261,8 +147,8 @@ var handleRouteChange = function() {
   var currentQueryString = document.location.search;
 
   if (/board/.test(currentLocation)
-   && !/\?act=search/.test(currentQueryString)
-   && !/\?act=create/.test(currentQueryString)
+    && !/\?act=search/.test(currentQueryString)
+    && !/\?act=create/.test(currentQueryString)
   ) {
     discussionBoardRoute();
   } else if (/topic/.test(currentLocation)) {
@@ -270,11 +156,7 @@ var handleRouteChange = function() {
   }
 };
 
-var handleBoardUpdate = function(e) {
-
-  playGifs();
-  convertToMarkdown();
-
+var handleBoardUpdate = function (e) {
   if (options.dontScrollPosts) {
     return 1;
   }

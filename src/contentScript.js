@@ -1,33 +1,8 @@
-// Load options
-var vkmOptions = this.vkmOptions;
-vkmOptions.loadOptions()
-  .then(function() {
-    var options = vkmOptions.options;
-
-    var actualCode = '(' + function(options) {
-      window.vkManagerOptions = options;
-    } + ')(' + JSON.stringify(options) +');';
-
-    var script = document.createElement('script');
-    script.textContent = actualCode;
-    (document.head||document.documentElement).appendChild(script);
-    script.remove();
-
-    // Load dependencies
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = chrome.extension.getURL('lib/marked.min.js');
-    s.onload = function() {
-      this.parentNode.removeChild(this);
-
-      // Load pageScript
-      var s = document.createElement('script');
-      s.type = 'text/javascript';
-      s.src = chrome.extension.getURL('src/pageScript.js');
-      s.onload = function() {
-        this.parentNode.removeChild(this);
-      };
-      (document.head || document.documentElement).appendChild(s);
-    };
-    (document.head || document.documentElement).appendChild(s);
-  });
+// Create script tag for ./pageScript.js and appends to head
+const s = document.createElement('script');
+s.type = 'text/javascript';
+s.src = chrome.runtime.getURL('src/pageScript.js');
+s.onload = function () {
+  this.parentNode.removeChild(this);
+};
+(document.head || document.documentElement).appendChild(s);
