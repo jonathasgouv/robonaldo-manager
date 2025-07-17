@@ -1,3 +1,7 @@
+const options = {
+  dontScrollPosts: true
+}
+
 // Override nav.setLoc, this is called on every page change
 nav.setLoc = (function () {
   var cached_function = nav.setLoc;
@@ -67,10 +71,6 @@ var overrideBoardUpdates = function () {
       return function () {
 
         var result = cached_function.apply(this, arguments);
-
-        if (arguments && arguments.length >= 1) {
-          removeMarkdownBodyClass(arguments[1]);
-        }
 
         return result;
       };
