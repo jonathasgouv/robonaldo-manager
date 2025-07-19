@@ -1,6 +1,6 @@
 const options = {
   dontScrollPosts: true
-}
+};
 
 // Override nav.setLoc, this is called on every page change
 nav.setLoc = (function () {
@@ -103,6 +103,7 @@ overrideBoardUpdates();
 var discussionBoardRoute = function () {
   // Update the "Discussion Board" to reload on click
   var $discussionBoard = document.querySelector('.ui_crumb:last-child');
+  var $createTopic = document.querySelector('[onclick="return Board.goCreate(this, event)"]');
 
   if ($discussionBoard) {
     var $link = document.createElement('a');
@@ -122,6 +123,14 @@ var discussionBoardRoute = function () {
     }
 
     $discussionBoard.parentNode.replaceChild($link, $discussionBoard);
+  }
+
+  if ($createTopic) {
+    $createTopic.addEventListener('click', function () {
+      const currentUrlWithoutQuery = document.location.origin +  document.location.pathname;
+      const newUrl = currentUrlWithoutQuery + '?act=create';
+      window.location.href = newUrl;
+    });
   }
 };
 
