@@ -3,18 +3,20 @@ const options = {
 };
 
 // Override nav.setLoc, this is called on every page change
-nav.setLoc = (function () {
-  var cached_function = nav.setLoc;
+if (nav) {
+  nav.setLoc = (function () {
+    var cached_function = nav.setLoc;
 
-  return function () {
+    return function () {
 
-    var result = cached_function.apply(this, arguments);
+      var result = cached_function.apply(this, arguments);
 
-    handleRouteChange();
+      handleRouteChange();
 
-    return result;
-  };
-})();
+      return result;
+    };
+  })();
+}
 
 var overrideBoardUpdates = function () {
   if (typeof Board !== 'undefined'
@@ -127,7 +129,7 @@ var discussionBoardRoute = function () {
 
   if ($createTopic) {
     $createTopic.addEventListener('click', function () {
-      const currentUrlWithoutQuery = document.location.origin +  document.location.pathname;
+      const currentUrlWithoutQuery = document.location.origin + document.location.pathname;
       const newUrl = currentUrlWithoutQuery + '?act=create';
       window.location.href = newUrl;
     });
